@@ -13,16 +13,16 @@ function createServer() {
 
     res.setHeader('Content-Type', 'text/plain');
 
-    if (!req.url.startsWith('/file/')) {
-      res.end('pathname should start with /file/');
+    if (!req.url.startsWith('/file')) {
+      res.statusCode = 400;
+
+      res.end();
 
       return;
     }
 
-    if (req.url.includes('../')) {
-      res.statusCode = 400;
-
-      res.end();
+    if (!req.url.startsWith('/file/')) {
+      res.end('hint message');
 
       return;
     }
@@ -36,6 +36,13 @@ function createServer() {
     }
 
     const path = pathname.slice(5);
+
+    if (!fs.existsSync(`public/${path}`)) {
+      res.statusCode = 404;
+      res.end('File not found');
+
+      return;
+    }
 
     fs.readFile(`public/${path}`, (err, data) => {
       if (!err) {
